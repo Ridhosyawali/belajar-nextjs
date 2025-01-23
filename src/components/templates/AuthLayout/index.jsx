@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 const AuthLayout = ({ title, desc, children, type = "register" }) => {
