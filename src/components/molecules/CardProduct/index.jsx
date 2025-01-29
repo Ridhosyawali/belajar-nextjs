@@ -23,7 +23,7 @@ function Header({ image }) {
       <Image
         src={image}
         alt={image}
-        className="rounded-t-lg p-4 w-[300px] h-[250px]"
+        className="rounded-t-lg p-4 w-full aspect-video object-contain object-center"
         width={250}
         height={250}
       />
@@ -35,8 +35,12 @@ function Body({ title, desc }) {
   return (
     <div className="px-5 pb-5">
       <Link href="#">
-        <h3 className="text-3xl font-bold text-slate-500">{title}</h3>
-        <p className="mt-3 text-slate-700 text-base text-justify">{desc}</p>
+        <h3 className="text-3xl font-bold text-slate-700 line-clamp-2">
+          {title}
+        </h3>
+        <p className="mt-3 text-slate-700 text-base text-justify line-clamp-3">
+          {desc}
+        </p>
       </Link>
     </div>
   );
@@ -44,8 +48,8 @@ function Body({ title, desc }) {
 
 function Footer({ price, handleAddToCart, id }) {
   return (
-    <div className="flex flex-col items-center justify-center px-5 pb-5">
-      <span className="text-2xl font-semibold mb-2">{price}</span>
+    <div className="flex flex-col items-center justify-center px-5 pb-5 mt-auto w-full">
+      <span className="text-2xl font-semibold mb-2">$ {price}</span>
       <Button
         className="w-full bg-gradient-aigen"
         onClick={() => handleAddToCart(id)}

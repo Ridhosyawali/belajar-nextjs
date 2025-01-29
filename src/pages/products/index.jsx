@@ -10,6 +10,7 @@ import React, {
 } from "react";
 import { data } from "@/constant/product";
 import DoubleArrowUp from "@/components/atoms/icons/DoubleArrowUp";
+import { getProducts } from "@/services/product";
 
 ///anggap data dari api/be
 
@@ -20,6 +21,21 @@ const ProductPage = () => {
   // useRef : hooks yang digunakan untuk referensi ke elemen DOM/fungsi untuk mengakses elemen DOM
   const footerRef = useRef();
   const [showBackToTop, setShowBackToTop] = useState(false);
+
+  const [data, setData] = useState([]);
+
+  // useEffect untuk ambil API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts();
+        setData(data.slice(0, 8));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   // useEffect digunakan untul menangani side efek dari perubahan suatu data yang dijalankan setiap halaman di load
   useEffect(() => {
@@ -60,7 +76,7 @@ const ProductPage = () => {
   const calculateTotal = useCallback(() => {
     return cart.reduce((total, item) => {
       const product = data.find((product) => product.id === item.id);
-      return total + product.price * item.qty;
+      return total + product?.price * item.qty;
     }, 0);
   }, [cart]);
 
@@ -131,21 +147,24 @@ const ProductPage = () => {
           Logout
         </Button>
       </div>
-      <div className="flex px-5 py-8">
+      <div className="flex px-5 py-8 gap-4">
         {/* products */}
         <div className="flex flex-col">
           <h1 className="text-3xl font-bold text-blue-500 uppercase mb-4">
             Products
           </h1>
-          <div className="flex flex-wrap gap-4">
+          <div className="grid grid-cols-3 gap-4">
             {data.map((item) => (
-              <CardProduct key={item.id}>
-                <CardProduct.Header image={item.image} />
-                <CardProduct.Body title={item.title} desc={item.description} />
+              <CardProduct key={item?.id}>
+                <CardProduct.Header image={item?.image} />
+                <CardProduct.Body
+                  title={item?.title}
+                  desc={item?.description}
+                />
                 <CardProduct.Footer
-                  price={item.price}
+                  price={item?.price}
                   handleAddToCart={handlerAddToCart}
-                  id={item.id}
+                  id={item?.id}
                 />
               </CardProduct>
             ))}
@@ -153,8 +172,8 @@ const ProductPage = () => {
         </div>
 
         {/* cart */}
-        {(cart.length > 0 && (
-          <div className="w-2/8">
+        {(cart?.length > 0 && (
+          <div className="w-1/3">
             <h1 className="text-3xl font-bold text-blue-500 mb-4 uppercase">
               Cart
             </h1>
@@ -164,16 +183,20 @@ const ProductPage = () => {
                 return (
                   <div className="flex p-4 border rounded-lg">
                     <Image
-                      className="rounded"
+                      className="rounded object-cover object-center"
                       width={100}
                       height={100}
-                      src={datas.image}
+                      src={datas?.image}
                       alt="cart image"
                     />
                     <div className="flex justify-between w-full">
                       <div className="flex flex-col justify-between ml-3">
-                        <span className="font-bold text-xl">{datas.title}</span>
-                        <span className="font-semibold">Rp. {datas.price}</span>
+                        <span className="font-bold text-xl">
+                          {datas?.title}
+                        </span>
+                        <span className="font-semibold">
+                          Rp. {datas?.price}
+                        </span>
                       </div>
                       <div className="flex flex-col justify-center items-center">
                         <span className="mb-1">Qty</span>
@@ -188,14 +211,10 @@ const ProductPage = () => {
             </div>
             <div className="flex justify-between px-4 py-2 border mt-2 font-semibold rounded-lg">
               <span>Total</span>
-              <span>Rp. {cartTotal}</span>
+              <span>$ {cartTotal}</span>
             </div>
           </div>
-        )) || (
-          <div className="flex justify-between px-4 py-2 border mt-2 font-semibold rounded-lg h-fit">
-            <span>Anda belum menambahkan product ke cart</span>
-          </div>
-        )}
+        )) || <div></div>}
       </div>
 
       {/* footer */}
