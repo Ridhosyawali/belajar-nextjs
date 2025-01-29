@@ -1,9 +1,14 @@
 import Button from "@/components/atoms/Button";
 import CardProduct from "@/components/molecules/CardProduct";
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { data } from "@/constant/product";
-import Icons from "@/components/atoms/icons";
 import DoubleArrowUp from "@/components/atoms/icons/DoubleArrowUp";
 
 ///anggap data dari api/be
@@ -11,7 +16,7 @@ import DoubleArrowUp from "@/components/atoms/icons/DoubleArrowUp";
 const ProductPage = () => {
   const [username, setUsername] = useState("");
   const [cart, setCart] = useState([]);
-  const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState(0); // kita tidak menggunakan state ini lagi karna kita sudah menggunakan useMemo
   // useRef : hooks yang digunakan untuk referensi ke elemen DOM/fungsi untuk mengakses elemen DOM
   const footerRef = useRef();
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -46,13 +51,29 @@ const ProductPage = () => {
     }
   };
 
+  /** UseCallback: hooks untuk menyimpan fungsi yang kompleks ke dalam cache
+   * tujuannya biar fungsi tersebut tidak perlu dijalankan ulang ketika tidak ada perubahan
+   */
+
+  // useMemo : hooks untuk menyimpan hasil komputasi(perhitaungan) yang kompleks ke dalam cache,
+  // tujuannya biar fungsi tsb ga perlu dijalankan/dihitung ulang ketika tidak ada perubahan
+  const calculateTotal = useCallback(() => {
+    return cart.reduce((total, item) => {
+      const product = data.find((product) => product.id === item.id);
+      return total + product.price * item.qty;
+    }, 0);
+  }, [cart]);
+
+  // panggil fungsi useCallback untuk mendapatkan nilai total
+  const cartTotal = calculateTotal();
+
   useEffect(() => {
     if (cart.length > 0) {
-      const sumTotal = cart.reduce((total, item) => {
-        const product = data.find((product) => product.id === item.id);
-        return total + product.price * item.qty;
-      }, 0);
-      setTotal(sumTotal);
+      // const sumTotal = cart.reduce((total, item) => {
+      //   const product = data.find((product) => product.id === item.id);
+      //   return total + product.price * item.qty;
+      // }, 0);
+      // setTotal(sumTotal);
 
       localStorage.setItem("cart", JSON.stringify(cart));
     }
@@ -167,7 +188,7 @@ const ProductPage = () => {
             </div>
             <div className="flex justify-between px-4 py-2 border mt-2 font-semibold rounded-lg">
               <span>Total</span>
-              <span>Rp. {total}</span>
+              <span>Rp. {cartTotal}</span>
             </div>
           </div>
         )) || (
