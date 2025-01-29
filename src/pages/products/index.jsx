@@ -1,8 +1,10 @@
 import Button from "@/components/atoms/Button";
 import CardProduct from "@/components/molecules/CardProduct";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { data } from "@/constant/product";
+import Icons from "@/components/atoms/icons";
+import DoubleArrowUp from "@/components/atoms/icons/DoubleArrowUp";
 
 ///anggap data dari api/be
 
@@ -10,6 +12,9 @@ const ProductPage = () => {
   const [username, setUsername] = useState("");
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
+  // useRef : hooks yang digunakan untuk referensi ke elemen DOM/fungsi untuk mengakses elemen DOM
+  const footerRef = useRef();
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   // useEffect digunakan untul menangani side efek dari perubahan suatu data yang dijalankan setiap halaman di load
   useEffect(() => {
@@ -59,6 +64,40 @@ const ProductPage = () => {
     localStorage.removeItem("password");
     localStorage.removeItem("cart");
     window.location.href = "/login";
+  }
+
+  useEffect(() => {
+    function handleScroll() {
+      // mengambil nilai offsetTop(posisi vertikal) dari elemen footer yang direferennsikan oleh footerRef
+      const footerTop = footerRef.current.offsetTop; //mengambil batas atas komponen
+
+      // mengambil tinggi innerHeight dari objek window(tinggi viewport tanpa toolbar & scrollbar)
+      const viewportHeight = window.innerHeight;
+
+      const scrollPosition = window.scrollY; // mengambil posisi vertikal saat ini dari scroll
+
+      // logic untuk mengecek apakah posisi scroll telah mencapai elemen footer
+      if (scrollPosition + viewportHeight >= footerTop) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    }
+
+    // event listener buat menjalankan fungsi handleScroll setiap event scroll terjadi
+    window.addEventListener("scroll", handleScroll);
+
+    // unmount
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [footerRef]);
+
+  function handleBackToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }
   return (
     <>
@@ -137,6 +176,22 @@ const ProductPage = () => {
           </div>
         )}
       </div>
+
+      {/* footer */}
+      {showBackToTop && (
+        <div
+          onClick={handleBackToTop}
+          className="fixed bottom-20 right-5 bg-gradient-hover p-2 rounded-full"
+        >
+          <DoubleArrowUp />
+        </div>
+      )}
+      <footer
+        ref={footerRef}
+        className="text-center p-5 bg-black text-white w-full"
+      >
+        All right reserved &copy; || by Ridho
+      </footer>
     </>
   );
 };
