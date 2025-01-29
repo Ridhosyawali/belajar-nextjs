@@ -1,21 +1,101 @@
 import Button from "@/components/atoms/Button";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  // contoh data dari API
-  const data = {
-    text: "Klik lah!",
+  // anggap state ini menyimpann data dari API
+  const [data, setData] = useState(true);
+  const [isMobile, setIsMobile] = useState({
+    width: 0,
+    height: 0,
+    mobile: false,
+  });
+
+  /** useState : hooks react untuk membuat state ke functional component
+   * state : variabel yang menyimpan data
+   * data : state ayng menyimpan nilai awal data
+   * setData : fungsi untuk memperbaharui data
+   * true (boolean) : tipe data dari nilai awal state data
+   * ketika setData dipanggil dengan nilai baru, react akan merender ulang komponen dengan nilai state yang baru
+   */
+
+  // fungsi untuk memperbaharui nilai state
+  const handleChange = () => {
+    // mengubah state data dari nilai awal true menjadi false
+    // setData(false);
+
+    // fungsi anonymous yang akan ngerubah nilai boolean menjadi true ke false dan sebaliknya
+    setData((darmaData) => !darmaData);
   };
+
+  useEffect(() => {
+    // MOUNTING
+    setIsMobile({
+      width: window.innerWidth,
+      height: window.innerHeight,
+      mobile: false,
+    });
+
+    // UPDATING
+    window.addEventListener("resize", (event) => {
+      setIsMobile({
+        width: event.target.innerWidth,
+        height: event.target.innerHeight,
+        mobile: window.innerWidth < 768 ? true : false,
+      });
+    });
+
+    // UNMOUNTING
+    return () => {
+      window.removeEventListener("resize", () => {});
+    };
+  }, []);
+  /** UseEffect : hooks react untuk menambahkan side effect ke state
+   * useEffect biasanya diapaki untuk memperbaharui data/komponen ketika ada perubahan pada state
+   * [] (array kosong/dependency array : jika array kosong maka argumen tersebut utuk menjalankan useEffect sekali
+   * jika ada state didalam array tsb maka untuk memantau setiap ada perubahan pada state atau
+   * setiap kali page direfresh)
+   */
+
+  console.log(isMobile.width);
+  console.log(isMobile.height);
+
   return (
     <>
-      <div className="flex justify-center items-center h-screen gap-2">
-        {/* button biasa */}
-        <button className="h-10 font-semibold bg-blue-600 text-white p-2">
-          CLick me!
+      <div
+        className={`flex flex-col justify-center items-center h-screen gap-3 ${
+          data ? "bg-black text-white" : "bg-white text-black"
+        }`}
+      >
+        {data ? (
+          <h1 className="text-5xl font-bold text-white">Data</h1>
+        ) : (
+          <h1 className="text-5xl font-bold">Update Data</h1>
+        )}
+
+        {isMobile.mobile ? <p>MOBILE</p> : <p>Desktop</p>}
+        <button
+          onClick={handleChange}
+          type="button"
+          className="mt-4 p-4 bg-blue-500 text-white font-bold rounded"
+        >
+          Change
         </button>
-        {/* Button dengan basis komponen single close Tag */}
-        <Button />
-        {/* BUtton dengan props */}
       </div>
     </>
   );
 }
+
+// contoh data dari API
+// const data = {
+//   text: "Klik lah!",
+// };
+
+// <div className="flex justify-center items-center h-screen gap-2">
+//     {/* button biasa */}
+//     <button className="h-10 font-semibold bg-blue-600 text-white p-2">
+//       CLick me!
+//     </button>
+//     {/* Button dengan basis komponen single close Tag */}
+//     <Button />
+//     {/* BUtton dengan props */}
+//   </div>
