@@ -1,5 +1,7 @@
+import { isMobileScreenAtom } from "@/atoms/atoms";
 import Button from "@/components/atoms/Button";
 import { useLogin } from "@/hooks/useLogin";
+import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -7,8 +9,10 @@ export default function Home() {
   // anggap state ini menyimpann data dari API
   const [data, setData] = useState(true);
 
-  const { isMobileScreen } = useSelector((state) => state.screen);
-  console.log("Mobile :", isMobileScreen);
+  const [isMobileScreen] = useAtom(isMobileScreenAtom);
+
+  // const { isMobileScreen } = useSelector((state) => state.screen);
+  console.log("Mobile :", isMobileScreenAtom);
 
   const username = useLogin();
   /** useState : hooks react untuk membuat state ke functional component
