@@ -21,6 +21,5 @@ export const login = async (payload) => {
 
 export function getCurrentUser(token) {
   const decoded = jwtDecode(token);
-  console.log(decoded);
   return decoded.user;
 }

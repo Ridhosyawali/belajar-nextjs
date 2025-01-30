@@ -1,4 +1,5 @@
 import Button from "@/components/atoms/Button";
+import { useLogin } from "@/hooks/useLogin";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -10,6 +11,7 @@ export default function Home() {
     mobile: false,
   });
 
+  const username = useLogin();
   /** useState : hooks react untuk membuat state ke functional component
    * state : variabel yang menyimpan data
    * data : state ayng menyimpan nilai awal data
@@ -78,8 +80,9 @@ export default function Home() {
           type="button"
           className="mt-4 p-4 bg-blue-500 text-white font-bold rounded"
         >
-          Change
+          change
         </button>
+        <p className="mt-2">Hi, {username}</p>
       </div>
     </>
   );
