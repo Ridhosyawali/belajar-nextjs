@@ -14,11 +14,14 @@ import { getProducts } from "@/services/product";
 import { useRouter } from "next/router";
 import { useLogin } from "@/hooks/useLogin";
 import { formatCurrency } from "@/helpers/utils/formatCurrency";
+import { useDispatch, useSelector } from "react-redux";
+import { setUsername } from "@/redux/screenSlice/screenSlice";
+import { getCurrentUser } from "@/services/auth";
 
 ///anggap data dari api/be
 
 const ProductPage = ({ data }) => {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState([]); // <- direplace sama redux
   const [total, setTotal] = useState(0); // kita tidak menggunakan state ini lagi karna kita sudah menggunakan useMemo
   // useRef : hooks yang digunakan untuk referensi ke elemen DOM/fungsi untuk mengakses elemen DOM
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -26,7 +29,22 @@ const ProductPage = ({ data }) => {
 
   const footerRef = useRef();
   const router = useRouter();
-  const username = useLogin();
+  // const username = useLogin();
+
+  const dispacth = useDispatch(); //mengirim perubahan ke state global
+  const { isLargeScreen, username } = useSelector((state) => state.screen);
+  console.log(isLargeScreen);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // validasi token, untuk mengecek apakah ada token, jika tidak ada kembali ke login
+    if (token) {
+      dispacth(setUsername(getCurrentUser(token)));
+    } else {
+      router.push("/login");
+    }
+  }, []);
 
   // useEffect digunakan untul menangani side efek dari perubahan suatu data yang dijalankan setiap halaman di load
   useEffect(() => {
@@ -125,6 +143,11 @@ const ProductPage = ({ data }) => {
     <>
       <div className="flex justify-between items-center bg-black text-white font-bold px-5 py-4">
         <h1 className="text-xl">Hi, {username}</h1>
+        {isLargeScreen ? (
+          <p className="text-white">Desktop</p>
+        ) : (
+          <p className="text-white">Mobile</p>
+        )}
         <Button
           buttonClassname={"bg-red-500 hover:bg-red-700"}
           onClick={handleLogout}

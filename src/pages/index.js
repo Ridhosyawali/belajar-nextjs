@@ -1,15 +1,14 @@
 import Button from "@/components/atoms/Button";
 import { useLogin } from "@/hooks/useLogin";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function Home() {
   // anggap state ini menyimpann data dari API
   const [data, setData] = useState(true);
-  const [isMobile, setIsMobile] = useState({
-    width: 0,
-    height: 0,
-    mobile: false,
-  });
+
+  const { isMobileScreen } = useSelector((state) => state.screen);
+  console.log("Mobile :", isMobileScreen);
 
   const username = useLogin();
   /** useState : hooks react untuk membuat state ke functional component
@@ -29,38 +28,6 @@ export default function Home() {
     setData((darmaData) => !darmaData);
   };
 
-  useEffect(() => {
-    // MOUNTING
-    setIsMobile({
-      width: window.innerWidth,
-      height: window.innerHeight,
-      mobile: false,
-    });
-
-    // UPDATING
-    window.addEventListener("resize", (event) => {
-      setIsMobile({
-        width: event.target.innerWidth,
-        height: event.target.innerHeight,
-        mobile: window.innerWidth < 768 ? true : false,
-      });
-    });
-
-    // UNMOUNTING
-    return () => {
-      window.removeEventListener("resize", () => {});
-    };
-  }, []);
-  /** UseEffect : hooks react untuk menambahkan side effect ke state
-   * useEffect biasanya diapaki untuk memperbaharui data/komponen ketika ada perubahan pada state
-   * [] (array kosong/dependency array : jika array kosong maka argumen tersebut utuk menjalankan useEffect sekali
-   * jika ada state didalam array tsb maka untuk memantau setiap ada perubahan pada state atau
-   * setiap kali page direfresh)
-   */
-
-  console.log(isMobile.width);
-  console.log(isMobile.height);
-
   return (
     <>
       <div
@@ -74,7 +41,7 @@ export default function Home() {
           <h1 className="text-5xl font-bold">Update Data</h1>
         )}
 
-        {isMobile.mobile ? <p>MOBILE</p> : <p>Desktop</p>}
+        {isMobileScreen ? <p>MOBILE</p> : <p>Desktop</p>}
         <button
           onClick={handleChange}
           type="button"
