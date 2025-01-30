@@ -1,19 +1,38 @@
 import Button from "@/components/atoms/Button";
 import InputForm from "@/components/molecules/InputForm";
+import { login } from "@/services/auth";
 import Link from "next/link";
-import React from "react";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 
 const Login = () => {
+  const [errorLogin, setErrorLogin] = useState();
+
+  const router = useRouter();
+
   // event handler untuk simulasi login
-  function handleLogin(event) {
+  async function handleLogin(event) {
     // event.preventdefault untuk mencegah reload
     event.preventDefault();
 
-    // menyimpan data ke local storage
-    localStorage.setItem("username", event.target.username.value);
-    localStorage.setItem("password", event.target.password.value);
+    const payload = {
+      username: event.target.username.value,
+      password: event.target.password.value,
+    };
 
-    window.location.href = "/products";
+    try {
+      const res = await login(payload);
+      if (res.status) {
+        localStorage.setItem("token", res.token);
+        router.push("/products");
+      } else {
+        console.log("login error :", res.error.response.data);
+        setErrorLogin(res.error.response.data);
+      }
+    } catch (error) {
+      console.log("login failed :", error);
+      setErrorLogin(error.response);
+    }
   }
   return (
     // onSubmit : event handler untuk menangani aksi ketika disubmit(button = submit)
@@ -37,6 +56,9 @@ const Login = () => {
       >
         Login
       </Button>
+      {errorLogin && (
+        <p className="mt-4 text-center text-sm text-red-500">{errorLogin}</p>
+      )}
       <p className="text-center text-sm mt-2">
         Dont have an account?{" "}
         <Link className="text-blue-700" href="/register">

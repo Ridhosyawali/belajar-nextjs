@@ -11,6 +11,8 @@ import React, {
 import { data } from "@/constant/product";
 import DoubleArrowUp from "@/components/atoms/icons/DoubleArrowUp";
 import { getProducts } from "@/services/product";
+import { getCurrentUser } from "@/services/auth";
+import { useRouter } from "next/router";
 
 ///anggap data dari api/be
 
@@ -19,10 +21,11 @@ const ProductPage = () => {
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0); // kita tidak menggunakan state ini lagi karna kita sudah menggunakan useMemo
   // useRef : hooks yang digunakan untuk referensi ke elemen DOM/fungsi untuk mengakses elemen DOM
-  const footerRef = useRef();
   const [showBackToTop, setShowBackToTop] = useState(false);
-
   const [data, setData] = useState([]);
+
+  const footerRef = useRef();
+  const router = useRouter();
 
   // useEffect untuk ambil API
   useEffect(() => {
@@ -39,9 +42,11 @@ const ProductPage = () => {
 
   // useEffect digunakan untul menangani side efek dari perubahan suatu data yang dijalankan setiap halaman di load
   useEffect(() => {
-    const getUsername = setUsername(localStorage.getItem("username"));
-    if (getUsername) {
-      setUsername(getUsername);
+    const token = localStorage.getItem("token");
+    if (token) {
+      setUsername(getCurrentUser(token));
+    } else {
+      router.push("/login");
     }
 
     // ambil data dari localstorage lalu parsing, tambahkan logic agar maping tidak error
@@ -97,10 +102,9 @@ const ProductPage = () => {
 
   // event handler untuk menjalankan fungsi logout dan mengapus data di local storage
   function handleLogout() {
-    localStorage.removeItem("username");
-    localStorage.removeItem("password");
+    localStorage.removeItem("token");
     localStorage.removeItem("cart");
-    window.location.href = "/login";
+    router.push("/login");
   }
 
   useEffect(() => {
