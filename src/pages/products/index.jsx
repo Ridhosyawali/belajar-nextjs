@@ -17,29 +17,16 @@ import { formatCurrency } from "@/helpers/utils/formatCurrency";
 
 ///anggap data dari api/be
 
-const ProductPage = () => {
+const ProductPage = ({ data }) => {
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0); // kita tidak menggunakan state ini lagi karna kita sudah menggunakan useMemo
   // useRef : hooks yang digunakan untuk referensi ke elemen DOM/fungsi untuk mengakses elemen DOM
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [data, setData] = useState([]);
+  // const [data, setData] = useState([]); //SSR tidak perlu state ini
 
   const footerRef = useRef();
   const router = useRouter();
   const username = useLogin();
-
-  // useEffect untuk ambil API
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getProducts();
-        setData(data.slice(0, 8));
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchProducts();
-  }, []);
 
   // useEffect digunakan untul menangani side efek dari perubahan suatu data yang dijalankan setiap halaman di load
   useEffect(() => {
@@ -77,7 +64,7 @@ const ProductPage = () => {
       const product = data.find((product) => product.id === item.id);
       return total + product?.price * item.qty;
     }, 0);
-  }, [cart]);
+  }, [cart, data]);
 
   // panggil fungsi useCallback untuk mendapatkan nilai total
   const cartTotal = calculateTotal();
@@ -233,5 +220,26 @@ const ProductPage = () => {
     </>
   );
 };
+
+//fungsi untuk mengambil data di sisi server sebelum akhirnya di render ke HTML
+// cocok untuk server yang dinamis
+export async function getServerSideProps() {
+  // Cara pertama untuk pemanggilan API
+  try {
+    const products = await getProducts();
+    const sliceProduct = products.slice(0, 8);
+
+    // Cara kedua jika mau manggil beberapa service sekaligus menggunakan promise
+    // const [products] = await promise.all([getProducts()])
+
+    return {
+      props: {
+        data: sliceProduct || [],
+      },
+    };
+  } catch (error) {
+    console.log("Failed fatching : ", error);
+  }
+}
 
 export default ProductPage;
