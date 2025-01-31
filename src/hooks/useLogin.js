@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 export const useLogin = () => {
   const [username, setUsername] = useState("");
-  const router = useRouter;
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");

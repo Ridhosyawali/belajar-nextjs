@@ -12,7 +12,7 @@ export default function Home() {
   const [isMobileScreen] = useAtom(isMobileScreenAtom);
 
   // const { isMobileScreen } = useSelector((state) => state.screen);
-  console.log("Mobile :", isMobileScreenAtom);
+  // console.log("Mobile :", isMobileScreenAtom);
 
   const username = useLogin();
   /** useState : hooks react untuk membuat state ke functional component

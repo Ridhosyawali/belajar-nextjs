@@ -33,7 +33,7 @@ const ProductPage = ({ data }) => {
 
   const dispacth = useDispatch(); //mengirim perubahan ke state global
   const { isLargeScreen, username } = useSelector((state) => state.screen);
-  console.log(isLargeScreen);
+  // console.log(isLargeScreen);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -164,10 +164,14 @@ const ProductPage = ({ data }) => {
           <div className="grid grid-cols-3 gap-4">
             {data.map((item) => (
               <CardProduct key={item?.id}>
-                <CardProduct.Header image={item?.image} />
+                <CardProduct.Header
+                  image={item?.image}
+                  link={`/products/${item?.id}`}
+                />
                 <CardProduct.Body
                   title={item?.title}
                   desc={item?.description}
+                  link={`/products/${item?.id}`}
                 />
                 <CardProduct.Footer
                   price={item?.price}
