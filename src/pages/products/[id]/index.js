@@ -1,3 +1,4 @@
+import { formatCurrency } from "@/helpers/utils/formatCurrency";
 import { getProductById } from "@/services/product";
 import axios from "axios";
 import Image from "next/image";
@@ -17,7 +18,7 @@ import useSWR from "swr";
 const ProductDetailPage = ({ detailProduct }) => {
   const api = process.env.NEXT_PUBLIC_API;
 
-  const { data } = useSWR(
+  const { data, error, isLoading } = useSWR(
     `${api}/products/${detailProduct.id}`,
     async () => {
       const res = await axios.get(`${api}/products/${detailProduct.id}`);
@@ -28,6 +29,15 @@ const ProductDetailPage = ({ detailProduct }) => {
     }
   );
 
+  if (error)
+    return (
+      <div className="h-screen text-8xl text-center">Gagal mengambil data</div>
+    );
+  if (isLoading)
+    return (
+      <div className="h-screen text-8xl text-center">Sedang memuat data</div>
+    );
+
   return (
     <>
       <div className="flex flex-col px-5 py-5 bg-gradient-to-b from-black to-blue-900 min-h-screen">
@@ -37,7 +47,9 @@ const ProductDetailPage = ({ detailProduct }) => {
           <p className="text-white font-bold mt-5 text-xl">
             {data?.description}
           </p>
-          <p className="text-white text-xl font-bold mt-5">{data?.price}</p>
+          <p className="text-white text-xl font-bold mt-5">
+            {formatCurrency(data?.price)}
+          </p>
 
           <Image
             src={data?.image}
